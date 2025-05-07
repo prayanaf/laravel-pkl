@@ -8,7 +8,6 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Guru extends Model
 {
-    use HasFactory;
     use HasRoles;
 
     protected $fillable = [

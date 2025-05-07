@@ -8,7 +8,6 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Siswa extends Model
 {
-    use HasFactory;
     use HasRoles;
 
     protected $fillable = [
