@@ -33,4 +33,11 @@ class Pkl extends Model
     {
         return $this->belongsTo(Guru::class);
     }
+
+//booted itu trigger laravel
+    public static function booted(): void { 
+        static::created(function (Pkl $pkl) {
+            $pkl->siswa->update(['status_pkl' => 1]);
+        });
+    }
 }

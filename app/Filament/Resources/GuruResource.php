@@ -99,4 +99,8 @@ class GuruResource extends Resource
             'index' => Pages\ManageGurus::route('/'),
         ];
     }
+    public static function getNavigationLabel(): string
+    {
+        return 'Data Guru'; // get navigation
+    }
 }

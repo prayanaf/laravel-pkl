@@ -19,6 +19,9 @@ class IndustriResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
 
+    //ganti label nama
+    protected static ?string $pluralLable = 'Data Industri';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -85,5 +88,9 @@ class IndustriResource extends Resource
         return [
             'index' => Pages\ManageIndustris::route('/'),
         ];
+    }
+    public static function getNavigationLabel(): string
+    {
+        return 'Data Industri'; // get navigation
     }
 }

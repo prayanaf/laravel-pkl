@@ -13,9 +13,11 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Columns\BadgeColumn;
-
-class SiswaResource extends Resource
-{
+use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Columns\ImageColumn;
+  
+  class SiswaResource extends Resource
+  {
     protected static ?string $model = Siswa::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
@@ -48,12 +50,17 @@ class SiswaResource extends Resource
                     ->email()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Toggle::make('status_pkl')
-                    ->required(),
-            ]);
-    }
-
-    public static function table(Table $table): Table
+                // Forms\Components\Toggle::make('status_pkl')
+                //       ->required(),
+                    FileUpload::make('foto_siswa')
+                      ->label('Foto Siswa')
+                      ->image() // Tambahkan ini
+                      ->disk('public') // Tambahkan ini (sesuaikan jika menggunakan disk lain)
+                      ->directory('siswa-photos')
+                      ->required(),
+              ]);
+      }
+  public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -83,6 +90,10 @@ class SiswaResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\ImageColumn::make('foto_siswa')
+                    ->label('Foto')
+                    ->circular(),
+
             ])
             ->filters([
                 //
@@ -103,5 +114,9 @@ class SiswaResource extends Resource
         return [
             'index' => Pages\ManageSiswas::route('/'),
         ];
+    }
+    public static function getNavigationLabel(): string
+    {
+        return 'Data Siswa'; // get navigation
     }
 }

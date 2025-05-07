@@ -103,4 +103,8 @@ class PklResource extends Resource
             'index' => Pages\ManagePkls::route('/'),
         ];
     }
+    public static function getNavigationLabel(): string
+    {
+        return 'Data PKL'; // get navigation
+    }
 }
