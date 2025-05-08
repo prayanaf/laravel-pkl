@@ -13,7 +13,13 @@ class ManageUsers extends ManageRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->label('Add New User'), // Ganti teks tombol di sini
         ];
+    }
+
+    public function getTitle(): string
+    {
+        return 'Users List'; // Opsional: ganti judul halaman
     }
 }

@@ -13,7 +13,13 @@ class ManagePkls extends ManageRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->label('Add New Pkl'), // Ganti teks tombol di sini
         ];
+    }
+
+    public function getTitle(): string
+    {
+        return 'Pkls Recap List'; // Opsional: ganti judul halaman
     }
 }

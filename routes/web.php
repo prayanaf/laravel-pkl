@@ -2,11 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\SiswaImportController;
 
 // Halaman utama
 Route::get('/', function () {
     return view('welcome');
 });
+
 // ========== Admin/Default Jetstream User ==========
 Route::middleware([
     'auth:sanctum',

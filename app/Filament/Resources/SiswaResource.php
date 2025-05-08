@@ -15,9 +15,14 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Columns\ImageColumn;
-  
-  class SiswaResource extends Resource
-  {
+use Filament\Tables\Actions\Action;
+use Illuminate\Support\Facades\Storage;
+use Filament\Notifications\Notification;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\SiswaImport;
+
+class SiswaResource extends Resource
+{
     protected static ?string $model = Siswa::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
@@ -50,17 +55,16 @@ use Filament\Tables\Columns\ImageColumn;
                     ->email()
                     ->required()
                     ->maxLength(255),
-                // Forms\Components\Toggle::make('status_pkl')
-                //       ->required(),
-                    FileUpload::make('foto_siswa')
-                      ->label('Foto Siswa')
-                      ->image() // Tambahkan ini
-                      ->disk('public') // Tambahkan ini (sesuaikan jika menggunakan disk lain)
-                      ->directory('siswa-photos')
-                      ->required(),
-              ]);
-      }
-  public static function table(Table $table): Table
+                FileUpload::make('foto_siswa')
+                    ->label('Foto Siswa')
+                    ->image()
+                    ->disk('public')
+                    ->directory('siswa-photos')
+                    ->required(),
+            ]);
+    }
+
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -93,7 +97,6 @@ use Filament\Tables\Columns\ImageColumn;
                 Tables\Columns\ImageColumn::make('foto_siswa')
                     ->label('Foto')
                     ->circular(),
-
             ])
             ->filters([
                 //
@@ -106,6 +109,30 @@ use Filament\Tables\Columns\ImageColumn;
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
+            ->headerActions([
+                Action::make('Import CSV')
+                    ->label('Import CSV')
+                    ->color('success')
+                    ->icon('heroicon-o-arrow-up-tray')
+                    ->form([
+                        FileUpload::make('file')
+                            ->label('Pilih CSV')
+                            ->acceptedFileTypes(['text/csv', 'text/plain', 'application/vnd.ms-excel'])
+                            ->disk('public')
+                            ->directory('uploads')
+                            ->required(),
+                    ])
+                    ->action(function (array $data) {
+                        $filePath = storage_path('app/public/' . $data['file']);
+                        Excel::import(new SiswaImport, $filePath);
+                        Storage::disk('public')->delete($data['file']);
+
+                        Notification::make()
+                            ->title('Data siswa berhasil diimpor!')
+                            ->success()
+                            ->send();
+                    }),
             ]);
     }
 
@@ -115,8 +142,10 @@ use Filament\Tables\Columns\ImageColumn;
             'index' => Pages\ManageSiswas::route('/'),
         ];
     }
+
     public static function getNavigationLabel(): string
     {
-        return 'Data Siswa'; // get navigation
+        return 'Data Siswa';
     }
 }
+

@@ -12,6 +12,14 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Imports\GuruImport;
+
+// Tambahan use untuk fitur Import CSV
+use Filament\Tables\Actions\Action;
+use Filament\Forms\Components\FileUpload;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
+use Filament\Notifications\Notification;
 
 class GuruResource extends Resource
 {
@@ -61,7 +69,7 @@ class GuruResource extends Resource
                 Tables\Columns\BadgeColumn::make('gender')
                     ->colors([
                         'primary' => 'Laki-laki',
-                        'pink' => 'Perempuan',
+                        'primary' => 'Perempuan',
                     ])
                     ->label('Gender'),                
                 Tables\Columns\TextColumn::make('alamat')
@@ -90,7 +98,33 @@ class GuruResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
+            // Tambahan dimulai di sini
+            ->headerActions([
+                Action::make('Import CSV')
+                    ->label('Import CSV')
+                    ->color('success')
+                    ->icon('heroicon-o-arrow-up-tray')
+                    ->form([
+                        FileUpload::make('file')
+                            ->label('Pilih CSV')
+                            ->acceptedFileTypes(['text/csv', 'text/plain', 'application/vnd.ms-excel'])
+                            ->disk('public')
+                            ->directory('uploads')
+                            ->required(),
+                    ])
+                    ->action(function (array $data) {
+                        $filePath = storage_path('app/public/' . $data['file']);
+                        Excel::import(new GuruImport, $filePath);
+                        Storage::disk('public')->delete($data['file']);
+
+                        Notification::make()
+                            ->title('Data guru berhasil diimpor!')
+                            ->success()
+                            ->send();
+                    }),
             ]);
+            // Tambahan selesai di sini
     }
 
     public static function getPages(): array
@@ -99,6 +133,7 @@ class GuruResource extends Resource
             'index' => Pages\ManageGurus::route('/'),
         ];
     }
+
     public static function getNavigationLabel(): string
     {
         return 'Data Guru'; // get navigation

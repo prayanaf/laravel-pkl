@@ -12,6 +12,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Exports\PklExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Filament\Tables\Actions\Action;
 
 class PklResource extends Resource
 {
@@ -94,7 +97,19 @@ class PklResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
+            ->headerActions([
+                Action::make('export')
+                    ->label('Export Excel')
+                    ->color('success')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->action(function () {
+                        $fileName = 'data_pkl.xlsx';
+                        Excel::store(new PklExport, $fileName, 'public');
+                        return response()->download(storage_path("app/public/{$fileName}"));
+                    }),
             ]);
+            
     }
 
     public static function getPages(): array
